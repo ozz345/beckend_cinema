@@ -2,6 +2,7 @@ from bson import ObjectId
 from flask import Flask, jsonify
 from flask.json.provider import DefaultJSONProvider
 from flask_cors import CORS
+from pymongo import MongoClient
 from routers.movies__router import add_movies, movies_bp
 from routers.subscriptions__router import (add_member_bp, delete_mem,
                                            members_bp, update_mem)
@@ -58,6 +59,18 @@ app.register_blueprint(add_movies, url_prefix="/add_movies")
 app.register_blueprint(get_all_usersnames, url_prefix="/get_all_users_MDB")
 
 app.register_blueprint(watched_movies_bp, url_prefix="/watched_movies")
+
+# Basic connection
+client = MongoClient('mongodb://localhost:27017/')
+
+# With authentication if needed
+client = MongoClient('mongodb://username:password@localhost:27017/')
+
+# With connection options
+client = MongoClient('mongodb://localhost:27017/',
+    serverSelectionTimeoutMS=5000,  # 5 second timeout
+    connectTimeoutMS=10000,         # 10 second timeout
+)
 
 if __name__ == '__main__':
     print("Starting Flask server...")
