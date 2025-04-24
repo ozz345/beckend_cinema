@@ -27,7 +27,7 @@ app = Flask(__name__)
 # Configure CORS with specific origin and methods
 CORS(app, resources={
     r"/*": {
-
+        "origins": "*",
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "supports_credentials": True
