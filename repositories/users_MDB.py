@@ -4,7 +4,7 @@ from pymongo import MongoClient
 
 class UsersDB:
     def __init__(self):
-        self.__client = MongoClient(port=27017)
+        self.__client = MongoClient("mongodb+srv://ozz345:iyrog8nYNCPCC472@cluster0.jd9cm4v.mongodb.net/")
         self.__db = self.__client["final_project"]
         self.__collection = self.__db["UsersDB"]
 
