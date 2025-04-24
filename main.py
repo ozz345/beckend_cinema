@@ -27,17 +27,18 @@ app = Flask(__name__)
 # Configure CORS with specific origin and methods
 CORS(app, resources={
     r"/*": {
-        "origins": "*",
+        "origins": ["http://localhost:5173", "https://beckend-cinema.onrender.com"],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
-        "supports_credentials": True
+        "supports_credentials": True,
+        "expose_headers": ["Content-Type", "Authorization"]
     }
 })
 
 app.json = CustomJSONEncoder(app)
 
 # Test route
-@app.route('/test', methods=['GET'])
+@app.route('/test', methods=["GET"])
 def test():
     return jsonify({"message": "Server is running!"})
 
@@ -57,7 +58,6 @@ app.register_blueprint(delete_mem, url_prefix="/delete_member")
 app.register_blueprint(movies_bp, url_prefix="/movies")
 app.register_blueprint(add_movies, url_prefix="/add_movies")
 app.register_blueprint(get_all_usersnames, url_prefix="/get_all_users_MDB")
-
 app.register_blueprint(watched_movies_bp, url_prefix="/watched_movies")
 
 # Basic connection
