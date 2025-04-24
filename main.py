@@ -1,5 +1,5 @@
 from bson import ObjectId
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask.json.provider import DefaultJSONProvider
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -24,22 +24,33 @@ class CustomJSONEncoder(DefaultJSONProvider):
         return super().default(self, obj)
 
 app = Flask(__name__)
-# Configure CORS with specific origin and methods
+
+# Configure CORS with more permissive settings
 CORS(app, resources={
     r"/*": {
-        "origins": ["http://localhost:5173", "https://beckend-cinema.onrender.com"],
+        "origins": "*",  # Allow all origins
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"],
+        "allow_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Origin"],
         "supports_credentials": True,
-        "expose_headers": ["Content-Type", "Authorization"]
+        "expose_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Origin"]
     }
 })
 
+# Add CORS headers to all responses
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
+
 app.json = CustomJSONEncoder(app)
 
-# Test route
-@app.route('/test', methods=["GET"])
+# Test route with CORS debugging
+@app.route('/test', methods=["GET", "OPTIONS"])
 def test():
+    if request.method == "OPTIONS":
+        return jsonify({"message": "CORS preflight successful"}), 200
     return jsonify({"message": "Server is running!"})
 
 # Register blueprints
