@@ -3,7 +3,7 @@ import json
 
 class Premissionfile:
     def __init__(self):
-        self.__file = 'React&py_project/beck-end/data/Premission.json'
+        self.__file = 'https://github.com/ozz345/beckend_cinema/blob/main/data/Premission.json'
 
     def get_all_premissions(self):
         with open(self.__file, 'r') as fp:
