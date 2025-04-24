@@ -1,5 +1,5 @@
 from bson import ObjectId
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 from flask.json.provider import DefaultJSONProvider
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -24,36 +24,21 @@ class CustomJSONEncoder(DefaultJSONProvider):
         return super().default(self, obj)
 
 app = Flask(__name__)
-
-# Configure CORS with more specific settings
+# Configure CORS with specific origin and methods
 CORS(app, resources={
     r"/*": {
-        "origins": ["http://localhost:5173", "https://beckend-cinema.onrender.com"],
+        "origins": "*",
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Origin"],
-        "supports_credentials": True,
-        "expose_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Origin"],
-        "max_age": 3600
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
     }
 })
 
-# Add CORS headers to all responses
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
-    response.headers.add('Access-Control-Max-Age', '3600')
-    return response
-
 app.json = CustomJSONEncoder(app)
 
-# Test route with CORS debugging
-@app.route('/test', methods=["GET", "OPTIONS"])
+# Test route
+@app.route('/test', methods=['GET'])
 def test():
-    if request.method == "OPTIONS":
-        return jsonify({"message": "CORS preflight successful"}), 200
     return jsonify({"message": "Server is running!"})
 
 # Register blueprints
@@ -72,6 +57,7 @@ app.register_blueprint(delete_mem, url_prefix="/delete_member")
 app.register_blueprint(movies_bp, url_prefix="/movies")
 app.register_blueprint(add_movies, url_prefix="/add_movies")
 app.register_blueprint(get_all_usersnames, url_prefix="/get_all_users_MDB")
+
 app.register_blueprint(watched_movies_bp, url_prefix="/watched_movies")
 
 # Basic connection
