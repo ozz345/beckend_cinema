@@ -3,7 +3,11 @@ import json
 
 class Premissionfile:
     def __init__(self):
+<<<<<<< HEAD
         self.__file = 'https://github.com/ozz345/beckend_cinema/blob/main/data/Premission.json'
+=======
+        self.__file = 'https://raw.githubusercontent.com/ozz345/beckend_cinema/main/data/Premission.json'
+>>>>>>> b52e18a1b4733b87c39b117a0ed471c5c4016ea4
 
     def get_all_premissions(self):
         with open(self.__file, 'r') as fp:
