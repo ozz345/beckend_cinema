@@ -25,23 +25,26 @@ class CustomJSONEncoder(DefaultJSONProvider):
 
 app = Flask(__name__)
 
-# Configure CORS with more permissive settings
+# Configure CORS with more specific settings
 CORS(app, resources={
     r"/*": {
-        "origins": "*",  # Allow all origins
+        "origins": ["http://localhost:5173", "https://beckend-cinema.onrender.com"],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Origin"],
         "supports_credentials": True,
-        "expose_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Origin"]
+        "expose_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Origin"],
+        "max_age": 3600
     }
 })
 
 # Add CORS headers to all responses
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    response.headers.add('Access-Control-Max-Age', '3600')
     return response
 
 app.json = CustomJSONEncoder(app)
