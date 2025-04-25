@@ -1,26 +1,16 @@
 import json
+
 import requests
-from pymongo import MongoClient
-from bson import ObjectId
+
 
 class Usersfile:
     def __init__(self):
         self.__file = 'https://raw.githubusercontent.com/ozz345/beckend_cinema/main/data/Users.json'
-        # MongoDB connection
-        self.client = MongoClient('mongodb://localhost:27017/')
-        self.db = self.client['cinema_db']
-        self.users_collection = self.db['users']
 
     def get_all_users(self):
         try:
-            # First try to get from MongoDB
-            mongo_users = list(self.users_collection.find({}, {'_id': 0}))
-            if mongo_users:
-                return mongo_users
-            
-            # If MongoDB is empty, try GitHub as backup
             response = requests.get(self.__file)
-            response.raise_for_status()
+            response.raise_for_status()  # Raise an exception for bad status codes
             data = response.json()
             return data["users"]
         except requests.exceptions.RequestException as e:
@@ -29,13 +19,15 @@ class Usersfile:
 
     def add_users(self, obj):
         try:
-            # Check if user with same ID already exists in MongoDB
-            existing_user = self.users_collection.find_one({"id": obj.get("id")})
-            if existing_user:
-                return {"message": "User with this ID already exists"}
+            users = self.get_all_users()
+            # Check if permission with same ID already exists
+            if any(p.get("id") == obj.get("id") for p in users):
+                return {"message": "Permission with this ID already exists"}
 
-            # Add the new user to MongoDB
-            self.users_collection.insert_one(obj)
+            users.append(obj)
+            data = {"users": users}
+            # Note: You can't write directly to GitHub URL
+            # You'll need to implement a different storage solution
             return {"message": "created"}
         except Exception as e:
             print(f"Error adding user: {str(e)}")
@@ -43,14 +35,16 @@ class Usersfile:
 
     def update_user(self, obj, id):
         try:
-            # Update user in MongoDB
-            result = self.users_collection.update_one(
-                {"id": id},
-                {"$set": obj}
-            )
-            
-            if result.modified_count > 0:
-                return {"message": "updated"}
+            users = self.get_all_users()
+            # Find the user by ID
+            for i, user in enumerate(users):
+                if user.get("id") == id:
+                    # Update the user data while preserving the ID
+                    obj["id"] = id
+                    users[i] = obj
+                    # Note: You can't write directly to GitHub URL
+                    # You'll need to implement a different storage solution
+                    return {"message": "updated"}
             return {"message": "user not found"}
         except Exception as e:
             print(f"Error updating user: {str(e)}")
@@ -58,12 +52,15 @@ class Usersfile:
 
     def delete_user(self, id):
         try:
-            # Delete user from MongoDB
-            result = self.users_collection.delete_one({"id": id})
-            
-            if result.deleted_count > 0:
-                return {"message": "deleted"}
+            users = self.get_all_users()
+            # Find and remove the user by ID
+            for i, user in enumerate(users):
+                if user.get("id") == id:
+                    users.pop(i)
+                    # Note: You can't write directly to GitHub URL
+                    # You'll need to implement a different storage solution
+                    return {"message": "deleted"}
             return {"message": "user not found"}
         except Exception as e:
             print(f"Error in delete_user operation: {str(e)}")
-            return {"message": "error deleting user", "error": str(e)} 
+            return {"message": "error deleting user", "error": str(e)}
