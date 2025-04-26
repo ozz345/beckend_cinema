@@ -4,7 +4,7 @@ import json
 
 class Usersfile:
     def __init__(self):
-        self.__file = 'React&py_project/beck-end/data/Users.json'
+        self.__file = 'Users.json'
 
     def get_all_users(self):
         with open(self.__file, 'r') as fp:
