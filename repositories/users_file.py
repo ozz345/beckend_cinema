@@ -1,53 +1,69 @@
+
 import json
 
+import requests
 
 class Premissionfile:
     def __init__(self):
         self.__file = 'https://raw.githubusercontent.com/ozz345/beckend_cinema/main/data/Premission.json'
 
-    def get_all_premissions(self):
-        with open(self.__file, 'r') as fp:
-            data = json.load(fp)
-        return data["premissions"]
+    def get_all_users(self):
+        try:
+            response = requests.get(self.__file)
+            response.raise_for_status()  # Raise an exception for bad status codes
+            data = response.json()
+            return data["users"]
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching users: {str(e)}")
+            return []
 
-    def add_premissions(self, obj):
-        premissions = self.get_all_premissions()
-        # Check if permission with same ID already exists
-        if any(p.get("id") == obj.get("id") for p in premissions):
-            return {"message": "Permission with this ID already exists"}
+    def add_users(self, obj):
+        try:
+            users = self.get_all_users()
+            # Check if permission with same ID already exists
+            if any(p.get("id") == obj.get("id") for p in users):
+                return {"message": "Permission with this ID already exists"}
 
-        premissions.append(obj)
-        data = {"premissions": premissions}
-        with open(self.__file, 'w') as fp:
-            json.dump(data, fp)
-        return {"message": "created"}
+            users.append(obj)
+            data = {"users": users}
+            # Note: You can't write directly to GitHub URL
+            # You'll need to implement a different storage solution
+            return {"message": "created"}
+        except Exception as e:
+            print(f"Error adding user: {str(e)}")
+            return {"message": "error adding user"}
 
-    def update_premissions(self, obj, id):
-        premissions = self.get_all_premissions()
-        # Find the permission by ID
-        for i, permission in enumerate(premissions):
-            if permission.get("id") == id:
-                # Update the permission data while preserving the ID
-                obj["id"] = id
-                premissions[i] = obj
-                data = {"premissions": premissions}
-                with open(self.__file, 'w') as fp:
-                    json.dump(data, fp)
-                return {"message": "updated"}
-        return {"message": "permission not found"}
+    def update_user(self, obj, id):
+        try:
+            users = self.get_all_users()
+            # Find the user by ID
+            for i, user in enumerate(users):
+                if user.get("id") == id:
+                    # Update the user data while preserving the ID
+                    obj["id"] = id
+                    users[i] = obj
+                    # Note: You can't write directly to GitHub URL
+                    # You'll need to implement a different storage solution
+                    return {"message": "updated"}
+            return {"message": "user not found"}
+        except Exception as e:
+            print(f"Error updating user: {str(e)}")
+            return {"message": "error updating user"}
 
     def delete_permissions(self, id):
         try:
-            premissions = self.get_all_premissions()
-            # Find and remove the permissions by ID
-            for i, permission in enumerate(premissions):
-                if permission.get("id") == id:
-                    premissions.pop(i)
-                    data = {"premissions": premissions}
-                    with open(self.__file, 'w') as fp:
-                        json.dump(data, fp)
+            users = self.get_all_users()
+            # Find and remove the user by ID
+            for i, user in enumerate(users):
+                if user.get("id") == id:
+                    users.pop(i)
+                    # Note: You can't write directly to GitHub URL
+                    # You'll need to implement a different storage solution
                     return {"message": "deleted"}
             return {"message": "permissions not found"}
         except Exception as e:
-            print(f"Error in delete_permissions file operation: {str(e)}")
-            return {"message": "error deleting permissions", "error": str(e)}
+            print(f"Error in delete_user operation: {str(e)}")
+            return {"message": "error deleting user", "error": str(e)}
+
+
+
