@@ -4,7 +4,7 @@ import json
 
 class Usersfile:
     def __init__(self):
-        self.__file = 'Users.json'
+        self.__file = 'https://raw.githubusercontent.com/ozz345/beckend_cinema/main/data/Users.json'
 
     def get_all_users(self):
         with open(self.__file, 'r') as fp:
