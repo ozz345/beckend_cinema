@@ -1,53 +1,51 @@
-
 import json
-
+import requests
 
 class Usersfile:
     def __init__(self):
-        self.__file = 'https://raw.githubusercontent.com/ozz345/beckend_cinema/main/data/Users.json'
+        self.__file_url = 'https://raw.githubusercontent.com/ozz345/beckend_cinema/main/data/Users.json'
 
     def get_all_users(self):
-        with open(self.__file, 'r') as fp:
-            data = json.load(fp)
+        response = requests.get(self.__file_url)
+        response.raise_for_status()  # Raise an error if the request failed
+        data = response.json()
         return data["users"]
 
     def add_users(self, obj):
         users = self.get_all_users()
-        # Check if permission with same ID already exists
+        # Check if user with same ID already exists
         if any(p.get("id") == obj.get("id") for p in users):
-            return {"message": "Permission with this ID already exists"}
+            return {"message": "User with this ID already exists"}
 
         users.append(obj)
         data = {"users": users}
-        with open(self.__file, 'w') as fp:
-            json.dump(data, fp)
-        return {"message": "created"}
+
+        # 🔥 WARNING: Cannot write directly to GitHub raw URL
+        print("New user data would be:", json.dumps(data, indent=4))
+        return {"message": "created (but file not actually updated)"}
 
     def update_user(self, obj, id):
         users = self.get_all_users()
-        # Find the user by ID
         for i, user in enumerate(users):
             if user.get("id") == id:
-                # Update the user data while preserving the ID
                 obj["id"] = id
                 users[i] = obj
                 data = {"users": users}
-                with open(self.__file, 'w') as fp:
-                    json.dump(data, fp)
-                return {"message": "updated"}
+
+                print("Updated user data would be:", json.dumps(data, indent=4))
+                return {"message": "updated (but file not actually updated)"}
         return {"message": "user not found"}
 
     def delete_user(self, id):
         try:
             users = self.get_all_users()
-            # Find and remove the user by ID
             for i, user in enumerate(users):
                 if user.get("id") == id:
                     users.pop(i)
                     data = {"users": users}
-                    with open(self.__file, 'w') as fp:
-                        json.dump(data, fp)
-                    return {"message": "deleted"}
+
+                    print("User data after deletion would be:", json.dumps(data, indent=4))
+                    return {"message": "deleted (but file not actually updated)"}
             return {"message": "user not found"}
         except Exception as e:
             print(f"Error in delete_user file operation: {str(e)}")
