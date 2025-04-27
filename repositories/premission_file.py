@@ -42,8 +42,9 @@ class Premissionfile:
                 try:
                     with open(self.__file_path, 'w') as file:
                         json.dump(data, file, indent=4)
-                    return {"message": "Permission updated successfully"}
+                    return {"message": "updated"}
                 except Exception as e:
+                    print(f"Error updating permission: {str(e)}")
                     return {"message": f"Error updating permission: {str(e)}"}
         return {"message": "permission not found"}
 
