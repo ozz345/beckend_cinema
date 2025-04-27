@@ -17,11 +17,16 @@ def sync_movies():
 @movies_bp.route("/", methods=["GET"])
 def get_all_movies():
     try:
+        print("Received request to get all movies")
         result = movies_service.get_all_movies()
+        print(f"Retrieved {len(result)} movies from database")
         return jsonify(result)
     except Exception as e:
         print(f"Error getting movies: {str(e)}")
-        return jsonify({"message": "Error getting movies"}), 500
+        print(f"Error type: {type(e)}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
+        return jsonify({"message": f"Error getting movies: {str(e)}"}), 500
 
 @add_movies.route("/", methods=["POST"])
 def add_movie():
